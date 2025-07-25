@@ -1,18 +1,12 @@
-// backend/routes/character.js
 const express = require('express');
 const router = express.Router();
+const characterController = require('../controllers/characterController');
 
-// Exemple de personnage temporaire (plus tard tu liras en DB)
-const exampleCharacter = {
-  name: "Aeldor",
-  level: 5,
-  hp: 42,
-  inventory: ["épée en fer", "potion de soin"]
-};
-
-// GET /api/character
-router.get('/', (req, res) => {
-  res.json(exampleCharacter);
-});
+// Routes REST
+router.post('/', characterController.createCharacter);
+router.get('/', characterController.getAllCharacters);
+router.get('/:id', characterController.getCharacterById);
+router.put('/:id', characterController.updateCharacter);
+router.delete('/:id', characterController.deleteCharacter);
 
 module.exports = router;
