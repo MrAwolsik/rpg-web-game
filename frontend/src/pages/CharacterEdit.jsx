@@ -1,24 +1,30 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  Container,
+  Form,
+  Button,
+  Alert,
+  Row,
+  Col,
+  Card,
+  Spinner,
+} from "react-bootstrap";
 import { getCharacterById, updateCharacter } from "../api/character";
 
 export default function CharacterEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [character, setCharacter] = useState(null);
+  const [form, setForm] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCharacter() {
       try {
         const data = await getCharacterById(id);
-        setCharacter(data);
-      } catch {
-        setError("Impossible de charger le personnage");
-      } finally {
-        setLoading(false);
+        setForm(data);
+      } catch (err) {
+        setError(err.message);
       }
     }
     fetchCharacter();
@@ -26,67 +32,92 @@ export default function CharacterEdit() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setCharacter((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (form.stats && name in form.stats) {
+      setForm({
+        ...form,
+        stats: { ...form.stats, [name]: Number(value) },
+      });
+    } else if (name === "level" || name === "experience") {
+      setForm({ ...form, [name]: Number(value) });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      await updateCharacter(id, character);
+      await updateCharacter(id, form);
       navigate(`/character/${id}`);
-    } catch {
-      setError("Erreur lors de la sauvegarde");
+    } catch (err) {
+      setError(err.message);
     }
   }
 
-  if (loading) return <p>Chargement...</p>;
-  if (error) return <p>{error}</p>;
-  if (!character) return null;
+  if (error) return <Alert variant="danger">Erreur : {error}</Alert>;
+  if (!form)
+    return (
+      <Container className="text-center my-5">
+        <Spinner animation="border" />
+      </Container>
+    );
 
   return (
-    <div className="max-w-lg mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Éditer le personnage</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <label>
-          Nom :{" "}
-          <input
-            type="text"
-            name="name"
-            value={character.name}
-            onChange={handleChange}
-            className="border p-1 rounded w-full"
-          />
-        </label>
-        <label>
-          Classe :{" "}
-          <input
-            type="text"
-            name="class"
-            value={character.class}
-            onChange={handleChange}
-            className="border p-1 rounded w-full"
-          />
-        </label>
-        <label>
-          Niveau :{" "}
-          <input
-            type="number"
-            name="level"
-            value={character.level}
-            onChange={handleChange}
-            className="border p-1 rounded w-full"
-          />
-        </label>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Sauvegarder
-        </button>
-      </form>
-    </div>
+    <Container className="my-5" style={{ maxWidth: "700px" }}>
+      <Card>
+        <Card.Header as="h2">Modifier le personnage</Card.Header>
+        <Card.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="formName">
+              <Form.Label>Nom</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formClass">
+              <Form.Label>Classe</Form.Label>
+              <Form.Select
+                name="class"
+                value={form.class}
+                onChange={handleChange}
+                required
+              >
+                <option value="warrior">Guerrier</option>
+                <option value="mage">Mage</option>
+                <option value="rogue">Voleur</option>
+              </Form.Select>
+            </Form.Group>
+
+            <Row>
+              {Object.entries(form.stats).map(([stat, val]) => (
+                <Col xs={6} md={4} key={stat}>
+                  <Form.Group className="mb-3" controlId={`form${stat}`}>
+                    <Form.Label>{stat.charAt(0).toUpperCase() + stat.slice(1)}</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name={stat}
+                      value={val}
+                      min={0}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+              ))}
+            </Row>
+
+            <Button variant="success" type="submit">
+              Enregistrer
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 }

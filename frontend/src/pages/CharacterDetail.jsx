@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Container, Card, ListGroup, Spinner, Alert } from "react-bootstrap";
 import { getCharacterById } from "../api/character";
 
 export default function CharacterDetail() {
@@ -19,27 +20,38 @@ export default function CharacterDetail() {
     fetchCharacter();
   }, [id]);
 
-  if (error) return <p>Erreur : {error}</p>;
-  if (!character) return <p>Chargement...</p>;
+  if (error) return <Alert variant="danger">Erreur : {error}</Alert>;
+  if (!character)
+    return (
+      <Container className="text-center my-5">
+        <Spinner animation="border" />
+      </Container>
+    );
 
   return (
-    <div className="p-6 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-4">{character.name}</h1>
-      <p><strong>Classe :</strong> {character.class}</p>
-      <p><strong>Niveau :</strong> {character.level}</p>
-      <p><strong>XP :</strong> {character.experience}</p>
+    <Container className="my-5" style={{ maxWidth: "600px" }}>
+      <Card>
+        <Card.Header as="h2">{character.name}</Card.Header>
+        <Card.Body>
+          <Card.Text>
+            <strong>Classe :</strong> {character.class}
+            <br />
+            <strong>Niveau :</strong> {character.level}
+            <br />
+            <strong>XP :</strong> {character.experience}
+          </Card.Text>
 
-      <div className="mt-4">
-        <h2 className="text-lg font-semibold">Statistiques</h2>
-        <ul className="list-disc ml-6">
-          <li>PV : {character.stats.hp}</li>
-          <li>Mana : {character.stats.mana}</li>
-          <li>Force : {character.stats.strength}</li>
-          <li>Intelligence : {character.stats.intelligence}</li>
-          <li>Agilité : {character.stats.agility}</li>
-          <li>Défense : {character.stats.defense}</li>
-        </ul>
-      </div>
-    </div>
+          <h5>Statistiques</h5>
+          <ListGroup variant="flush">
+            <ListGroup.Item>PV : {character.stats.hp}</ListGroup.Item>
+            <ListGroup.Item>Mana : {character.stats.mana}</ListGroup.Item>
+            <ListGroup.Item>Force : {character.stats.strength}</ListGroup.Item>
+            <ListGroup.Item>Intelligence : {character.stats.intelligence}</ListGroup.Item>
+            <ListGroup.Item>Agilité : {character.stats.agility}</ListGroup.Item>
+            <ListGroup.Item>Défense : {character.stats.defense}</ListGroup.Item>
+          </ListGroup>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 }
