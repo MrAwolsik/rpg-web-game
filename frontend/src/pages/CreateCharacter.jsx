@@ -10,7 +10,7 @@ export default function CreateCharacter() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createCharacter({
+      const createdCharacter = await createCharacter({
         name,
         class: charClass,
         stats: {
@@ -22,8 +22,8 @@ export default function CreateCharacter() {
           defense: 5,
         }
       });
-      alert("Personnage créé !");
-      navigate("/"); // ou vers une autre page
+      console.log("✅ ID utilisé pour redirection :", createdCharacter._id);
+      navigate(`/character/${createdCharacter._id}`);
     } catch (err) {
       alert("Erreur : " + err.message);
     }
