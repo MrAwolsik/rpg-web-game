@@ -175,6 +175,13 @@ export default App;
 
 ## ✅ Étape 7 — Lancer le projet
 
+### 0. Lancer tout d'un coup
+A la racine du projet
+
+```bash
+npm run start
+```
+
 ### 1. Lancer le backend :
 
 ```bash
