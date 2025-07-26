@@ -27,7 +27,7 @@ export default function App() {
           <Route path="/" element={<CharacterList />} />
           <Route path="/create" element={<CreateCharacter />} />
           <Route path="/character/:id" element={<CharacterDetail />} />
-          <Route path="/character/:id/edit" element={<CharacterEdit />} />
+          <Route path="/character/edit/:id" element={<CharacterEdit />} />
         </Routes>
       </Container>
     </Router>
