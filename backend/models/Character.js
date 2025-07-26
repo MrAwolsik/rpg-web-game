@@ -1,47 +1,36 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const mongoose = require("mongoose");
 
-const CharacterSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  level: {
-    type: Number,
-    default: 1,
-  },
-  experience: {
-    type: Number,
-    default: 0,
-  },
-  class: {
-    type: String,
-    enum: ['warrior', 'mage', 'rogue', 'archer'],
-    default: 'warrior',
-  },
+const characterSchema = new mongoose.Schema({
+  name: String,
+  class: String,
+  level: Number,
+  experience: Number,
   stats: {
-    hp: { type: Number, default: 100 },
-    mana: { type: Number, default: 50 },
-    strength: { type: Number, default: 10 },
-    intelligence: { type: Number, default: 10 },
-    agility: { type: Number, default: 10 },
-    defense: { type: Number, default: 5 }
+    hp: Number,
+    mana: Number,
+    strength: Number,
+    intelligence: Number,
+    agility: Number,
+    defense: Number,
+  },
+  equipment: {
+    weapon: { type: mongoose.Schema.Types.ObjectId, ref: "Weapon", default: null },
+    armor: { type: mongoose.Schema.Types.ObjectId, ref: "Armor", default: null },
   },
   inventory: [
     {
-      itemId: { type: Schema.Types.ObjectId, ref: 'Item' },
-      quantity: { type: Number, default: 1 }
-    }
+      itemId: { type: mongoose.Schema.Types.ObjectId, ref: "Item" },
+      type: { type: String, enum: ["item", "weapon", "armor"], required: true },
+      weight: { type: Number, required: true }, // poids individuel
+    },
   ],
-  equipment: {
-    weapon: { type: Schema.Types.ObjectId, ref: 'Item', default: null },
-    armor: { type: Schema.Types.ObjectId, ref: 'Item', default: null }
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  hasBackpack: { type: Boolean, default: false }, // nouveau champ
+}, { timestamps: true });
 
-module.exports = mongoose.model('Character', CharacterSchema);
+// 👇 Méthode virtuelle pour capacité max
+characterSchema.methods.getInventoryCapacity = function () {
+  const baseCapacity = this.stats.strength * 2; // ex : 2 unités par point de force
+  return this.hasBackpack ? baseCapacity + 10 : baseCapacity;
+};
+
+module.exports = mongoose.model("Character", characterSchema);

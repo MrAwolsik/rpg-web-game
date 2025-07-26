@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  type: { type: String },      // par ex: "consumable", "equipment", etc.
-  description: { type: String },
-  // ajoute ici les propriétés spécifiques à ton Item
+  type: { type: String, enum: ["consumable", "weapon", "armor"], required: true },
+  effect: { type: String },
 });
 
-module.exports = mongoose.model('Item', itemSchema);
+const Item = mongoose.model("Item", itemSchema);
+export default Item;

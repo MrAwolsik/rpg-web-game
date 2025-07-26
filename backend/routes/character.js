@@ -8,5 +8,8 @@ router.get('/', characterController.getAllCharacters);
 router.get('/:id', characterController.getCharacterById);
 router.put('/:id', characterController.updateCharacter);
 router.delete('/:id', characterController.deleteCharacter);
+router.post('/:characterId/inventory', characterController.addItemToInventory);
+// DELETE /api/characters/:characterId/inventory/:itemId
+router.delete('/:characterId/inventory/:itemId', characterController.removeItemFromInventory);
 
 module.exports = router;
